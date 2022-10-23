@@ -12,12 +12,14 @@ Amongst many other parameters, the logfiles can be analysed to compile a ranking
 Useful information on the general approach can e.g. be found here:
 
 https://software-berater.net/2020/schilde-hoch-fail2ban-und-ufw/
+
 https://www.the-art-of-web.com/system/fail2ban-log/
+
 https://stackoverflow.com/questions/47676718/parsing-ufw-logs-for-ip-and-port-numbers
 
 So, let's set up a tool that generates the ranking lists from the logfiles and converts them into csv files. Such files could be processed further with visualisation tools like Grafana.
 
-#Step 1: Generate a ranking
+# Step 1: Generate a ranking
 
 The first step is to generate a list of all IP addresses recorded in the fail2ban or ufw logfiles.
 
@@ -29,7 +31,7 @@ For fail2ban:
 
     { awk '($(NF-1) = /Ban/){print $NF}' /var/log/fail2ban.log ; zcat /var/log/fail2ban*.gz | awk '($(NF-1) = /Ban/){print $NF}' ; } | sort | uniq -c | sort -nr | head -n 250 > file.log
 
-#Step 2: whois check
+# Step 2: whois check
     
 Each line of the resulting file.log will contain a frequency parameter and an IP address. The number of entries can be adjusted by changing the numeric parameter of the head command at the end of the respective pipe. 
 
