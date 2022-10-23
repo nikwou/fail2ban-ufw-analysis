@@ -25,17 +25,33 @@ The first step is to generate a list of all IP addresses recorded in the fail2ba
 
 For ufw:
 
-    { awk '{match($0,/SRC=[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART+4,RLENGTH-4); 
-    match($0,/DPT=[0-9]{0,5}/); port = substr($0,RSTART+4,RLENGTH-4); print ip }' /var/log/ufw.log.1 ; 
-    zcat /var/log/ufw.log.*.gz | awk '{match($0,/SRC=[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART+4,RLENGTH-4); 
-    match($0,/DPT=[0-9]{0,5}/); port = substr($0,RSTART+4,RLENGTH-4); print ip }' ; } 
-    | sort | uniq -c | sort -nr | head -n 250 > file.log
+    { awk '{ 
+            match($0,/SRC=[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); 
+            ip = substr($0,RSTART+4,RLENGTH-4); 
+            match($0,/DPT=[0-9]{0,5}/); 
+            port = substr($0,RSTART+4,RLENGTH-4); 
+            print ip 
+        }' /var/log/ufw.log.1 ; 
+        zcat /var/log/ufw.log.*.gz | 
+        awk '{ 
+            match($0,/SRC=[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); 
+            ip = substr($0,RSTART+4,RLENGTH-4); 
+            match($0,/DPT=[0-9]{0,5}/); 
+            port = substr($0,RSTART+4,RLENGTH-4); 
+            print ip 
+        }' ; 
+    } | sort | uniq -c | sort -nr | head -n 250 > file.log
 
 For fail2ban:
 
-    { awk '($(NF-1) = /Ban/){print $NF}' /var/log/fail2ban.log ; 
-    zcat /var/log/fail2ban*.gz | awk '($(NF-1) = /Ban/){print $NF}' ; } 
-    | sort | uniq -c | sort -nr | head -n 250 > file.log
+    { awk '($(NF-1) = /Ban/) {
+            print $NF
+        }' /var/log/fail2ban.log ; 
+        zcat /var/log/fail2ban*.gz | 
+        awk '($(NF-1) = /Ban/) { 
+            print $NF
+        }' ; 
+    } | sort | uniq -c | sort -nr | head -n 250 > file.log
 
 ### Step 2: whois check
     
