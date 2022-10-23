@@ -3,11 +3,11 @@ brute force protection are critical components. For linux systems, ufw and fail2
 
 Both systems generate extensive logging information which can be analysed to learn more about how is knocking at your doors.
 
-Installation of the respective packages, namely ufw, fail2ban and whois, is outside the scope of this article.
+Installation of the respective packages, namely ufw, fail2ban and whois, is outside the scope of this article, but should not impose a hurdle.
 
 The packages store their logging files unter /var/log - the ufw logfiles are named ufw.log, while fail2ban logfiles can be found under fail2ban.log. As usual, both tools store older information in .gz files.
 
-Amongst many other parameters, the logfiles can be analysed to compile a ranking showing which servers have attempted to contact your host - e.g. by frequency or number of ports tried.
+Amongst many other parameters, the logfiles can be analysed to compile a ranking that shows which servers have attempted to contact your host - e.g. by frequency or number of ports tried.
 
 Useful information on the general approaches can e.g. be found here:
 
@@ -25,11 +25,17 @@ The first step is to generate a list of all IP addresses recorded in the fail2ba
 
 For ufw:
 
-    { awk '{match($0,/SRC=[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART+4,RLENGTH-4); match($0,/DPT=[0-9]{0,5}/); port = substr($0,RSTART+4,RLENGTH-4); print ip }' /var/log/ufw.log.1 ; zcat /var/log/ufw.log.*.gz | awk '{match($0,/SRC=[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART+4,RLENGTH-4); match($0,/DPT=[0-9]{0,5}/); port = substr($0,RSTART+4,RLENGTH-4); print ip }' ; } | sort | uniq -c | sort -nr | head -n 250 > file.log
+    { awk '{match($0,/SRC=[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART+4,RLENGTH-4); 
+    match($0,/DPT=[0-9]{0,5}/); port = substr($0,RSTART+4,RLENGTH-4); print ip }' /var/log/ufw.log.1 ; 
+    zcat /var/log/ufw.log.*.gz | awk '{match($0,/SRC=[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART+4,RLENGTH-4); 
+    match($0,/DPT=[0-9]{0,5}/); port = substr($0,RSTART+4,RLENGTH-4); print ip }' ; } 
+    | sort | uniq -c | sort -nr | head -n 250 > file.log
 
 For fail2ban:
 
-    { awk '($(NF-1) = /Ban/){print $NF}' /var/log/fail2ban.log ; zcat /var/log/fail2ban*.gz | awk '($(NF-1) = /Ban/){print $NF}' ; } | sort | uniq -c | sort -nr | head -n 250 > file.log
+    { awk '($(NF-1) = /Ban/){print $NF}' /var/log/fail2ban.log ; 
+    zcat /var/log/fail2ban*.gz | awk '($(NF-1) = /Ban/){print $NF}' ; } 
+    | sort | uniq -c | sort -nr | head -n 250 > file.log
 
 ### Step 2: whois check
     
@@ -64,4 +70,3 @@ The resulting ranked list is contained in file.log which is fed into a while loo
 ### Step 3: what next?
     
 The resulting topip.csv file will be accessible in the folder where the script has been executed. Information resulting from the analysis may e.g. lead to additional protective measures like geoblocking.
-
